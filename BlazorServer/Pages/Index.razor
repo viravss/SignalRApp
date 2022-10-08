@@ -1,0 +1,154 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client;
+@using BlazorServer.Model
+@inject NavigationManager NavManager
+@implements IAsyncDisposable
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+
+<style>
+
+    .chat-content {
+        z-index: 1000;
+        background-color: #ddd;
+        padding: 14px;
+        overflow-y: scroll;
+        height: 544px;
+    }
+
+        .chat-content li {
+            background-color: #fff;
+            -ms-border-radius: 4px;
+            border-radius: 4px;
+            padding: 10px;
+            list-style: none;
+            margin: 0;
+            margin-top: 10px;
+        }
+
+    .chat-time {
+        font-size: 9pt;
+        color: gray;
+        float: right;
+        font-weight: normal;
+    }
+
+    .chat-username {
+        font-weight: bold;
+    }
+
+    .chat-message-body {
+        border: 1px solid gray;
+        padding: 10px;
+    }
+
+    .chat-send-messageBox {
+        left: 16.3%;
+        padding: 20px;
+    }
+
+    .chat-textarea {
+        width: 100%;
+    }
+
+    /*    #chatcontent {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
+                            overflow-y: scroll;
+                        }
+
+                        #chatcontent::-webkit-scrollbar {
+                            display: none;
+                        }*/
+</style>
+<ul class="chat-content" id="chatcontent" onchage="alert('Teset')">
+    @if (messages.Count == 0)
+    {
+        <li> There is not messages </li>
+    }
+    @foreach (var message in messages)
+    {
+        <li>
+            <div class="row">
+                <div class="col-md-12 chat-username">@message.UserName <span class="chat-time">@message.MessageDateTime.ToString("U")</span></div>
+            </div>
+            <div class="chat-message-body">
+                <p> @message.Message </p>
+            </div>
+        </li>
+        <audio style="display: none" autoplay controls><source src="/Audio/bell.mp3" /></audio>
+        hasNewMessage = false;
+    }
+</ul>
+
+
+
+<div class="fixed-bottom chat-send-messageBox">
+    <hr />
+    @*<div class="form-group">
+        <label>
+        User: Farzad
+        </label>
+        </div>*@
+    <div class="form-group">
+
+        <textarea class="chat-textarea" placeholder="Type your message right here ... " @bind="messageInput"></textarea>
+
+    </div>
+
+    <button @onclick="Send" disabled="@(IsConnected == false)"> Send </button>
+</div>
+
+
+@code
+{
+
+
+    private HubConnection? hubConnection;
+    private List<MessageVM> messages = new();
+    private string? userInput;
+    private string? messageInput;
+    private DateTime messageDateTime = DateTime.Now;
+    private bool hasNewMessage = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavManager.ToAbsoluteUri("/chathub"))
+            .WithAutomaticReconnect()
+            .Build();
+        userInput = "Farzad";
+
+        hubConnection.On<string, string, DateTime>("ReceiveMessage", (user, message, messageDateTime) =>
+       {
+           //var formattedMessage = $"<small>{messageDateTime.ToString("U")}</small> => {user}: {message}";
+           messages.Add(new MessageVM
+               {
+                   Message = message,
+                   MessageDateTime = DateTime.Now,
+                   UserName = user
+               });
+           InvokeAsync(StateHasChanged);
+           hasNewMessage = true;
+
+       });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        if (hubConnection is not null)
+            await hubConnection.SendAsync("SendMessage", userInput, messageInput, messageDateTime);
+    }
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

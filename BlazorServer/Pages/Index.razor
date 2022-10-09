@@ -59,14 +59,14 @@
     }
 
     /*    #chatcontent {
-                                                -ms-overflow-style: none;
-                                                scrollbar-width: none;
-                                                overflow-y: scroll;
-                                            }
+                                                        -ms-overflow-style: none;
+                                                        scrollbar-width: none;
+                                                        overflow-y: scroll;
+                                                    }
 
-                                            #chatcontent::-webkit-scrollbar {
-                                                display: none;
-                                            }*/
+                                                    #chatcontent::-webkit-scrollbar {
+                                                        display: none;
+                                                    }*/
 </style>
 <ul class="chat-content" id="chatcontent" onchage="alert('Teset')">
     @if (messages.Count == 0)
@@ -88,15 +88,9 @@
     }
 </ul>
 
-
-
 <div class="fixed-bottom chat-send-messageBox">
     <hr />
-    @*<div class="form-group">
-        <label>
-        User: Farzad
-        </label>
-        </div>*@
+
     <div class="form-group">
 
         <textarea class="chat-textarea" placeholder="Type your message right here ... " @bind="messageInput"></textarea>

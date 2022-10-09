@@ -22,7 +22,7 @@ public class CommonRepository<T> : ICommonRepositories<T> where T : BaseEntity
     private ElasticClient CreateInstance()
     {
         var host = _configuration.GetSection("Elastic:host").Value;
-        var port = _configuration.GetSection("Elastic:post").Value;
+        var port = _configuration.GetSection("Elastic:port").Value;
         var userName = _configuration.GetSection("Elastic:userName").Value;
         var password = _configuration.GetSection("Elastic:password").Value;
         var settings = new ConnectionSettings(new Uri($"{host}:{port}"));
@@ -39,13 +39,13 @@ public class CommonRepository<T> : ICommonRepositories<T> where T : BaseEntity
 
         switch (indexName)
         {
-            case IndicesEnum.User:
+            case IndicesEnum.user:
                 await _client.Indices.CreateAsync(indexName.ToString(), ci => ci
                      .Index(indexName.ToString())
                      .UserMapping()
                      .Settings(s => s.NumberOfShards(3).NumberOfReplicas(1)));
                 break;
-            case IndicesEnum.Message:
+            case IndicesEnum.message:
                 await _client.Indices.CreateAsync(indexName.ToString(), ci => ci
                     .Index(indexName.ToString())
                     .MessageMapping()

@@ -4,7 +4,13 @@
 @inject NavigationManager NavManager
 @implements IAsyncDisposable
 @using Microsoft.JSInterop
+@using Application.Repositories
+@using Domain.Enums
+@using System.Diagnostics
+@using Domain.Entities
 @inject IJSRuntime JS
+
+@inject IMessageService _messageService
 
 
 <style>
@@ -53,14 +59,14 @@
     }
 
     /*    #chatcontent {
-                            -ms-overflow-style: none;
-                            scrollbar-width: none;
-                            overflow-y: scroll;
-                        }
+                                                -ms-overflow-style: none;
+                                                scrollbar-width: none;
+                                                overflow-y: scroll;
+                                            }
 
-                        #chatcontent::-webkit-scrollbar {
-                            display: none;
-                        }*/
+                                            #chatcontent::-webkit-scrollbar {
+                                                display: none;
+                                            }*/
 </style>
 <ul class="chat-content" id="chatcontent" onchage="alert('Teset')">
     @if (messages.Count == 0)
@@ -129,8 +135,19 @@
                    MessageDateTime = DateTime.Now,
                    UserName = user
                });
+
+           _messageService.InsertDocumentAsync(IndicesEnum.message, new Message
+               {
+                   CreatedOn = DateTime.Now,
+                   Id = Guid.NewGuid(),
+                   MessageBody = message,
+                   ReceiverId = Guid.NewGuid(),
+                   SenderId = Guid.NewGuid()
+               });
+
            InvokeAsync(StateHasChanged);
            hasNewMessage = true;
+           messageInput = "";
 
        });
 

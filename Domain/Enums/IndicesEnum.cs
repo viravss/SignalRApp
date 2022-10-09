@@ -2,6 +2,6 @@
 
 public enum IndicesEnum
 {
-    User,
-    Message
+    user,
+    message
 }

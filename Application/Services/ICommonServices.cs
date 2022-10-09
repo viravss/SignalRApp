@@ -1,14 +1,16 @@
 ﻿using System.Linq.Expressions;
 using Domain.Common;
+using Domain.Enums;
+using Nest;
 
 namespace Application.Repositories;
 
 public interface ICommonServices<T> where T : BaseEntity
 {
-    Task CheckIndexAsync(string indexName);
-    Task InsertDocumentAsync(string indexName, T entity);
-    Task DeleteIndexAsync(string indexName, T entity);
-    Task InsertBulkDocumentAsync(string indexName, string id);
-    Task<T> GetDocumentAsync(string indexName, string id);
-    Task<List<T>> GetDocumentAsync(string indexName);
+    Task CheckIndexAsync(IndicesEnum indexName);
+    Task InsertDocumentAsync(IndicesEnum indexName, T entity);
+    Task DeleteIndexAsync(IndicesEnum indexName, T entity);
+    Task InsertBulkDocumentAsync(IndicesEnum indexName, List<T> entities);
+    Task<T> GetDocumentAsync(IndicesEnum indexName, string id);
+    Task<List<T>> GetDocumentsAsync(string indexName, Func<QueryContainerDescriptor<T>, QueryContainer> conditions);
 }

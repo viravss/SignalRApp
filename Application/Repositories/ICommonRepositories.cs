@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Domain.Common;
+using Domain.Enums;
 using Nest;
 
 namespace Application.Repositories;
@@ -7,7 +8,7 @@ namespace Application.Repositories;
 public interface ICommonRepositories<T> where T : BaseEntity
 {
 
-    Task CheckIndexAsync(string indexName);
+    Task CheckIndexAsync(IndicesEnum indexName);
     Task InsertDocumentAsync(string indexName, T entity);
     Task DeleteIndexAsync(string indexName, T entity);
     Task<BulkResponse> InsertBulkDocumentAsync(string indexName, List<T> entities);

@@ -1,38 +1,47 @@
 ﻿using System.Linq.Expressions;
 using Application.Repositories;
 using Domain.Common;
+using Domain.Enums;
+using Nest;
 
 namespace Infrastructure.Services;
 
 public class CommonService<T> : ICommonServices<T> where T : BaseEntity
 {
-    public Task CheckIndexAsync(string indexName)
+    private readonly ICommonRepositories<T> _repositories;
+
+    public CommonService(ICommonRepositories<T> repositories)
     {
-        throw new NotImplementedException();
+        _repositories = repositories;
     }
 
-    public Task InsertDocumentAsync(string indexName, T entity)
+    public async Task CheckIndexAsync(IndicesEnum indexName)
     {
-        throw new NotImplementedException();
+        await _repositories.CheckIndexAsync(indexName);
     }
 
-    public Task DeleteIndexAsync(string indexName, T entity)
+    public async Task InsertDocumentAsync(IndicesEnum indexName, T entity)
     {
-        throw new NotImplementedException();
+        await _repositories.InsertDocumentAsync(indexName.ToString(), entity);
     }
 
-    public Task InsertBulkDocumentAsync(string indexName, string id)
+    public async Task DeleteIndexAsync(IndicesEnum indexName, T entity)
     {
-        throw new NotImplementedException();
+        await _repositories.DeleteIndexAsync(indexName.ToString(), entity);
     }
 
-    public Task<T> GetDocumentAsync(string indexName, string id)
+    public async Task InsertBulkDocumentAsync(IndicesEnum indexName, List<T> entities)
     {
-        throw new NotImplementedException();
+        await _repositories.InsertBulkDocumentAsync(indexName.ToString(), entities);
     }
 
-    public Task<List<T>> GetDocumentAsync(string indexName)
+    public async Task<T> GetDocumentAsync(IndicesEnum indexName, string id)
     {
-        throw new NotImplementedException();
+        return await _repositories.GetDocumentAsync(indexName.ToString(), id);
+    }
+
+    public async Task<List<T>> GetDocumentsAsync(string indexName, Func<QueryContainerDescriptor<T>, QueryContainer> conditions)
+    {
+        return await _repositories.GetDocumentAsync(indexName.ToString(), conditions);
     }
 }
